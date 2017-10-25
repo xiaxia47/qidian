@@ -13,8 +13,8 @@ BOT_NAME = 'qidian'
 
 SPIDER_MODULES = ['qidian.spiders']
 NEWSPIDER_MODULE = 'qidian.spiders'
-MYSQL_CONFIG = {'host':'97.64.25.39','port':3306,'user':'pythonuser',
-                'password':'SX21958','db':'python','charset':'utf8'}
+MYSQL_CONFIG = {'host':'','port':3306,'user':'',
+                'password':'','db':'python','charset':'utf8'}
 CHANIDLIST={'玄幻':21,'奇幻':1,'武侠':2,'仙侠':22,
             '都市':4,'现实':15,'军事':6,'历史':5,
             '游戏':7,'体育':8,'科幻':9,'灵异':10,
