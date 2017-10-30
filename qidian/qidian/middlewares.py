@@ -54,7 +54,7 @@ class HiderMiddleware(object):
 
         # Must return only requests (not items).
         for r in start_requests:
-            print('we are here')
+            print('process Requests')
             r.headers.setdefault('User-Agent',random.choice(self.agentlist))
             #r.meta["proxy"]='http://117.78.37.198:80'
             yield r
@@ -73,9 +73,12 @@ class AjaxMiddleware(object):
 
         # Must return only requests (not items).
         for r in start_requests:
-            print('AjaxMiddleware')
+            spider.logger.warning('AjaxMiddleware')
             if COMMENTS_URL in r:
                 r.headers.update({'Accept':'application/json, text/javascript, */*; q=0.01',
                             'X-Requested-With':'XMLHttpRequest'})
 
             yield r
+
+    def process_spider_exception(repsonse, exception, spider):
+        spider.logger.warning("Something goes wrong!!:",exception)
