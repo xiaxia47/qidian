@@ -10,7 +10,6 @@ class QidianSpider(scrapy.Spider):
     allowed_domain=['www.qidian.com',
                     'book.qidian.com']
     
-
     def start_requests(self):
         urls = 'https://www.qidian.com/all?'
         #for chanid in self.settings.getdict('CHANIDLIST').items():
@@ -25,10 +24,6 @@ class QidianSpider(scrapy.Spider):
                 url = 'https://www.qidian.com/all?'+urlencode(request_body)
                 yield scrapy.Request(url,dont_filter=True)
 
-
-    def get_body(self,chanid,page):
-        request_body= self.settings.getdict('DEFAULT_PARAM')
-        return request_body
 
     def parse(self,response):
         bot = Selector(response)
