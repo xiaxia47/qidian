@@ -3,7 +3,6 @@ import scrapy
 from scrapy import Selector
 from qidian.items import QidianItem
 from urllib.parse import urlencode
-import copy
 import json
 
 class QidianSpider(scrapy.Spider):
@@ -18,9 +17,7 @@ class QidianSpider(scrapy.Spider):
         #yield scrapy.Request(urls,body=self.get_body(chanid,1),dont_filter=True)
 #        print('request start')
 #        url = 'https://www.qidian.com/all?chanId=21&orderId=&page=1&style=2&pageSize=50&siteid=1&pubflag=0&hiddenField=0'
-#        yield scrapy.Request(url,dont_filter=True)
         request_body= self.settings.getdict('DEFAULT_PARAM')
-#        request_body= self.settings.getdict('DEFAULT_PARAM')
         for chanid in self.settings.getdict('CHANIDLIST').values():
             request_body['chanId']= chanid
             for page in range(1,20):
@@ -58,7 +55,7 @@ class QidianSpider(scrapy.Spider):
         item['click_count'] = click_content.split('|')[1].split('·')[0]
         item['recommand_count'] = click_content.split('|')[2].split('·')[0]
         item['book_id'] = item['book_url'].split('/')[-1]
-        detail_params = copy.deepcopy(self.settings.getdict('DEFAULT_COMEMENT_PARM'))
+        detail_params = self.settings.getdict('DEFAULT_COMEMENT_PARM')
         detail_params['_csrfToken'] = response.meta['csrfToken']
         detail_params['bookId']= item['book_id']
         next_url = self.settings.get('COMMENTS_URL')+urlencode(detail_params)
