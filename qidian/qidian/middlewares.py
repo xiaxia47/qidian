@@ -5,13 +5,12 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 from fake_useragent import UserAgent
-from twisted.enterprise import adbapi
 import logging
-from datetime import datetime,timedelta
 from scrapy.exceptions import NotSupported
 import pymysql
+from .proxy_factory import ProxyFactory
 
-class RandomUserAgentMiddleware(object):
+class RandomUserAgent(object):
     '''
     随机更换User-Agent
     '''
@@ -24,13 +23,9 @@ class RandomUserAgentMiddleware(object):
 
 class ProxyMiddleware(object):
 
-    def __init__(self,dbparm):
-        self.dbparm = dbparm
-        self.proxy_pool = []
-        self.drop_list = []
-        self.current_proxy = None
-        self.proxy_enabled = True
-
+    def __init__(self):
+        super(self).__init__()
+        self.proxies = ProxyFactory()
 
     def getProxyPool(self,drop_list):
         with pymysql.connect(**self.dbparm) as cursor:
@@ -65,12 +60,10 @@ class ProxyMiddleware(object):
 
 
     def process_request(self, request, spider):
-        if self.proxy_enabled == True:
-            if self.current_proxy == None:
-                self.current_proxy = self.renewProxy()
-            print('proxy is {}'.format(self.current_proxy))
-            request.meta['proxy'] = self.current_proxy
-            request.meta['dont_redirect'] = True
+        self.current_proxy = self.proxies.get_proxy()
+        print('proxy is {}'.format(self.current_proxy))
+        request.meta['proxy'] = self.current_proxy
+        request.meta['dont_redirect'] = True
 
     def process_exception(self,request, exception, spider):
         if isinstance(exception,NotSupported):

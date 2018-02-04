@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Selector
-from qidian.items import QidianItem
+from ..items import QidianItem
 from urllib.parse import urlencode
 import json
+
 
 class QidianSpider(scrapy.Spider):
     name = 'qidian'
@@ -13,13 +14,12 @@ class QidianSpider(scrapy.Spider):
     def start_requests(self):
         urls = 'https://www.qidian.com/all?'
         request_body= self.settings.getdict('DEFAULT_PARAM')
-        for chanid in self.settings.getdict('CHANIDLIST').values():
-            request_body['chanId']= chanid
+        for channel in self.settings.getdict('CHANIDLIST').values():
+            request_body['chanId']= channel
             for page in range(1,20):
                 request_body['page']=page
-                url = 'https://www.qidian.com/all?'+urlencode(request_body)
-                yield scrapy.Request(url,dont_filter=True)
-
+                url = "".join([urls,urlencode(request_body)])
+                yield scrapy.Request(url, dont_filter=True)
 
     def parse(self,response):
         bot = Selector(response)
@@ -37,7 +37,6 @@ class QidianSpider(scrapy.Spider):
             yield scrapy.Request(item['book_url'],meta={'item':item,'csrfToken':csrfToken},
                             callback=self.parse_detail)
 
-
     def parse_detail(self,response):
         bot = Selector(response)
         item = response.meta['item']
@@ -52,7 +51,6 @@ class QidianSpider(scrapy.Spider):
         next_url = self.settings.get('COMMENTS_URL')+urlencode(detail_params)
         yield scrapy.Request(next_url,meta={'item':item},callback=self.parse_rank)
 
-
     def get_cookies(self,cookie_key,response):
         cookie_list = response.headers.getlist('Set-Cookie')[0].decode('utf-8').split(';')
         for cookie in cookie_list:
@@ -61,11 +59,9 @@ class QidianSpider(scrapy.Spider):
         self.logger.info('ERORR:Cookie not found!! KEY is {}'.format(cookie_key))
         return ''
 
-
     def parse_rank(self,response):
         jsondata = json.loads(response.text)
         item = response.meta['item']
         item['rank_score'] = jsondata['data']['rate']
         item['rank_ppl_involved'] = jsondata['data']['userCount']
         yield item
-    
