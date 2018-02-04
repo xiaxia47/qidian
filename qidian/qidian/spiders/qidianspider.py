@@ -6,16 +6,12 @@ from urllib.parse import urlencode
 import json
 
 class QidianSpider(scrapy.Spider):
-    name = 'Qidian'
+    name = 'qidian'
     allowed_domain=['www.qidian.com',
                     'book.qidian.com']
     
     def start_requests(self):
         urls = 'https://www.qidian.com/all?'
-        #for chanid in self.settings.getdict('CHANIDLIST').items():
-        #yield scrapy.Request(urls,body=self.get_body(chanid,1),dont_filter=True)
-#        print('request start')
-#        url = 'https://www.qidian.com/all?chanId=21&orderId=&page=1&style=2&pageSize=50&siteid=1&pubflag=0&hiddenField=0'
         request_body= self.settings.getdict('DEFAULT_PARAM')
         for chanid in self.settings.getdict('CHANIDLIST').values():
             request_body['chanId']= chanid
